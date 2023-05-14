@@ -59,7 +59,8 @@ ROOT_URLCONF = 'loja.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -121,9 +122,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'templates/static')
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 STATICFILES = [
-    os.path.join('static')
+    os.path.join('templates/static')
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
@@ -156,3 +157,9 @@ SESSION_SAVE_EVERY_REQUEST = False
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# TODO: REMOVER DEBUG TOOLBAR
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
