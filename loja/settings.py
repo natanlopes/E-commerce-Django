@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+#adminloja - Natan1918*
 INSTALLED_APPS = [
     'produto',
     'pedido',
