@@ -31,7 +31,7 @@ def valida_cpf(cpf):
 
     sequencia = novo_cpf == str(novo_cpf[0]) * len(cpf)  # Verifica se há uma sequência de dígitos repetidos
 
-    if cpf == novo_cpf and not sequencia:  # Verifica se o CPF original é igual ao novo CPF e não há sequência
+    if cpf == novo_cpf and not sequencia:  # Verifica se o CPF original é igual ao novo CPF e não há sequência ..
         return True  # Retorna True indicando um CPF válido
     else:
         return False  # Retorna False indicando um CPF inválido
