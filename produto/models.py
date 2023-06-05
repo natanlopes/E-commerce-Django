@@ -2,18 +2,25 @@ from django.db import models
 from PIL import Image
 import os
 from django.conf import settings
+from django.utils.text import slugify
 # Create your models here.
 class Produto(models.Model):
     nome = models.CharField(max_length=225)
-    descricao_curta = models.TextField(max_length=225)
-    descricao_longa = models.TextField()
+    descricao_curta = models.TextField(max_length=225,verbose_name='Descrição Curta')
+    descricao_longa = models.TextField(verbose_name='Descrição Longa')
     imagem = models.ImageField(upload_to='produto_imagens/%Y/%m',blank=True,null=True)
-    preco_marting = models.FloatField()
-    preco_marting_promocional = models.FloatField(default=0)
-    slug = models.SlugField(unique=True)
+    preco_marting = models.FloatField(verbose_name='Preço')
+    preco_marting_promocional = models.FloatField(default=0, verbose_name='Preço Promo..')
+    slug = models.SlugField(unique=True,blank=True,null=True)
     tipo = models.CharField(default='V',max_length=1,choices=(('V','Variação'),('S','Simples'),))
 
 
+    def get_preco_formatado (self):
+         return f'R$ {self.preco_marting:.2f}'.replace('.',',')
+    get_preco_formatado.short_descripition = 'Preço'
+    def get_preco_promocional_formatado (self):
+         return f'R$ {self.preco_marting_promocional:.2f}'.replace('.',',')
+    get_preco_promocional_formatado.short_descripition = 'Preço Promo'
     @staticmethod
     def resize_image(img, new_width = 800):
         img_ful_path = os.path.join(settings.MEDIA_ROOT,img.name)
@@ -30,6 +37,9 @@ class Produto(models.Model):
             quality= 50
         )
     def save (self,*args ,**kwargs):
+        if not self.slug:
+            slug = f'{slugify(self.nome)}'
+            self.slug = slug
         super().save(*args,**kwargs)
         max_image_size = 800
         if self.imagem:
@@ -48,5 +58,5 @@ class Variacao(models.Model):
         return self.nome or self.produto.nome
 
     class Meta:
-      verbose_name = 'Variação'
+      verbose_name = 'Variavél'
       verbose_name_plural = 'Variações'
