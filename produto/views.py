@@ -2,10 +2,10 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.views import View
-
-class ListaProdutos(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('ListaProdutos')
+from . import models
+class ListaProdutos(ListView):
+   model = models.Produto
+   template_name = 'produto/lista.html'
 class DetalheProduto(View):
     def get(self, *args, **kwargs):
         return HttpResponse('DetalheProduto')
