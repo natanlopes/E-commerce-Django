@@ -3,6 +3,7 @@ from PIL import Image
 import os
 from django.conf import settings
 from django.utils.text import slugify
+from utils import utils
 # Create your models here.
 class Produto(models.Model):
     nome = models.CharField(max_length=225)
@@ -16,10 +17,10 @@ class Produto(models.Model):
 
 
     def get_preco_formatado (self):
-         return f'R$ {self.preco_marting:.2f}'.replace('.',',')
+         return utils.formata_preco(self.preco_marting)
     get_preco_formatado.short_descripition = 'Preço'
     def get_preco_promocional_formatado (self):
-         return f'R$ {self.preco_marting_promocional:.2f}'.replace('.',',')
+         return utils.formata_preco(self.preco_marting_promocional)
     get_preco_promocional_formatado.short_descripition = 'Preço Promo'
     @staticmethod
     def resize_image(img, new_width = 800):
