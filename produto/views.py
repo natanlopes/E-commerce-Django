@@ -5,6 +5,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
 from . import models
+from pprint import pprint
 from django.contrib import messages
 class ListaProdutos(ListView):
    model = models.Produto
@@ -19,6 +20,10 @@ class DetalheProduto(DetailView):
 class AdcionarAoCarinho(View):
 
     def get(self, *args, **kwargs):
+          # TODO : remover linhas abaixo
+        # if self.request.session.get('carrinho'):
+        #     del self.request.session['carrinho']
+        #     self.request.session.save()
         http_referer = self.request.META.get(
             'HTTP_REFERER',
             reverse('produto:lista')
@@ -30,23 +35,82 @@ class AdcionarAoCarinho(View):
                 'Produto nao existe')
             return redirect(http_referer)
         variacao = get_object_or_404(models.Variacao,id=variacao_id)
+        variacao_estoque = variacao.estoque
+        produto = variacao.produto
+
+        produto_id = produto.id
+        produto_nome = produto.nome
+        variacao_nome = variacao.nome or ''
+
+        preco_unitario = variacao.preco
+        preco_unitario_promocianal = variacao.preco_promocional
+        quantidade = 1
+        slug = produto.slug
+        imagem = produto.imagem
+
+        if imagem:
+            imagem = imagem.name
+        else:
+            imagem = ''
+
+        if variacao.estoque < 1:
+             messages.error(
+                 self.request,
+                 'Estoque insuficiente'
+             )
+             return redirect(http_referer)
+
+
         if not self.request.session.get('carinho'):
             self.request.session['carinho'] = {}
             self.request.session.save()
         carrinho = self.request.session['carinho']
         if variacao_id in carrinho:
-             # TODO: Variacao existe no carinho
-             pass
+             quantidade_carinho = carrinho[variacao_id]['quantidade']
+             quantidade_carinho += 1
+             if variacao_estoque < quantidade_carinho:
+                 messages.warning(
+                     self.request,
+                     f'Estoque insuficiente para {quantidade_carinho}x no '
+                     f'produto "{produto_nome}". Adcionamos {variacao_estoque}x'
+                     f'no seu carinho,'
+                 )
+                 quantidade_carinho = variacao_estoque
+
+             carrinho[variacao_id]['quantidade'] = quantidade_carinho
+             carrinho[variacao_id]['preco_quantitativo'] = preco_unitario * \
+                quantidade_carinho
+             carrinho[variacao_id]['reco_quantitativo_promocianal'] = preco_unitario_promocianal * \
+                quantidade_carinho
+
         else:
-             # TODO: Variacao nao existe no carinho
-             pass
-        return HttpResponse(f'{variacao.produto}{variacao.nome}')
+             carrinho[variacao_id] = {
+                'produto_id': produto.id,
+                'produto_nome':  produto.nome,
+                'variacao_nome':variacao_nome,
+                'variacao_id' :variacao_id,
+                'preco_unitario':preco_unitario,
+                'preco_unitario_promocianal':preco_unitario_promocianal,
+                'preco_quantitativo': preco_unitario,
+                'preco_quantitativo_promocianal': preco_unitario_promocianal,
+                'quantidade' :1,
+                'slug':slug,
+                'imagem':imagem,
+             }
+        self.request.session.save()
+        messages.success(
+           self.request,
+           f'Produto {produto_nome} {variacao_nome} adcionado ao seu '
+           f'carrinho{carrinho[variacao_id]["quantidade"]}x.'
+       )
+
+        return redirect(http_referer)
 class RemoverDoCarinho(View):
     def get(self, *args, **kwargs):
         return HttpResponse('RemoverDoCarinho')
 class Carinho(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Carinho')
+        return render(self.request,'produto/carrinho.html')
 class Finalizar(View):
     def get(self, *args, **kwargs):
         return HttpResponse('Finalizar')
