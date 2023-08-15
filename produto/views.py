@@ -122,11 +122,10 @@ class RemoverDoCarinho(View):
         carinho = self.request.session['carinho'][variacao_id]
         messages.success(
             self.request,
-            f'Produto {carinho["produto_nome"] } {carinho["variacao_nome"]}'
-            f'removido do seu carinho.'
+            f'Produto {carinho["produto_nome"]} {carinho["variacao_nome"]} removido do seu carinho.'
         )
 
-        del self.request.session['carinho'][variacao_id]
+        del self.request.session['carinho'] [variacao_id]
         self.request.session.save()
         return redirect(http_referer)
 
@@ -137,7 +136,7 @@ class Carinho(View):
         'carinho':self.request.session.get('carinho',{})
     }
        return render(self.request,'produto/carrinho.html',contexto)
-class Finalizar(View):
+class ResumoDacompra(View):
     def get(self, *args, **kwargs):
         return HttpResponse('Finalizar')
 

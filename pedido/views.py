@@ -6,7 +6,7 @@ from django.views import View
 class Pagar(View):
    def get(self,*args,**kwargs):
       return HttpResponse('Pagar')
-class FecharPedido(View):
+class SalvarPedido(View):
     def get(self, *args, **kwargs):
         return HttpResponse('FecharPedido')
 class Detalhe(View):
